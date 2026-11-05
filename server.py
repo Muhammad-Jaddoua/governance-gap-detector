@@ -6,12 +6,13 @@ from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue
 
+from config import COLLECTION, SOURCE_DOC
+
 # ── Config ────────────────────────────────────────────────────────────────────
-COLLECTION   = "ndmo_chunks"
 EMBEDDING_MODEL = "all-MiniLM-L6-v2"
-LLM_MODEL    = "tinyllama"   # swap to "mistral" once you have it pulled
-QDRANT_HOST  = "localhost"
-QDRANT_PORT  = 6333
+LLM_MODEL       = "tinyllama"   # swap to "mistral" once you have it pulled
+QDRANT_HOST     = "localhost"
+QDRANT_PORT     = 6333
 
 # ── Lifespan: load heavy objects once at startup ──────────────────────────────
 # Avoids reloading the embedding model on every request.
@@ -33,7 +34,7 @@ app = FastAPI(title="Governance Gap Detector", lifespan=lifespan)
 class AssessRequest(BaseModel):
     query: str
     top_k: int = 5
-    source_filter: str = "ndmo_framework.pdf"  # filter by document — critical for compliance traceability
+    source_filter: str = SOURCE_DOC  # filter by document — critical for compliance traceability
 
 class RetrievedClause(BaseModel):
     chunk_id: int

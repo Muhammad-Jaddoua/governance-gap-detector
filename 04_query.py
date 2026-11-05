@@ -4,9 +4,10 @@ from qdrant_client import QdrantClient
 from qdrant_client.models import Filter, FieldCondition, MatchValue, QueryRequest
 import ollama
 
+from config import COLLECTION, SOURCE_DOC
+
 model = SentenceTransformer("all-MiniLM-L6-v2")
 client = QdrantClient("localhost", port=6333)
-COLLECTION = "ndmo_chunks"
 
 def retrieve(query: str, top_k: int = 5) -> list[dict]:
     query_embedding = model.encode([query])[0].tolist()
@@ -16,7 +17,7 @@ def retrieve(query: str, top_k: int = 5) -> list[dict]:
         query=query_embedding,
         query_filter=Filter(
             must=[FieldCondition(key="source", 
-                                 match=MatchValue(value="ndmo_framework.pdf"))]
+                                 match=MatchValue(value=SOURCE_DOC))]
         ),
         limit=top_k,
         with_payload=True

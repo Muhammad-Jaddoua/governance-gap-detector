@@ -5,9 +5,11 @@ from sentence_transformers import SentenceTransformer
 from qdrant_client import QdrantClient
 from qdrant_client.models import Distance, VectorParams, PointStruct
 
+from config import COLLECTION, SOURCE_DOC
+
 DATA = Path(__file__).parent / "data"
 
-def embed_and_store(chunks_path: str, collection_name: str = "ndmo_chunks"):
+def embed_and_store(chunks_path: str, collection_name: str = COLLECTION):
     # Load chunks
     with open(chunks_path, "r", encoding="utf-8") as f:
         chunks = json.load(f)
@@ -41,7 +43,7 @@ def embed_and_store(chunks_path: str, collection_name: str = "ndmo_chunks"):
             payload={
                 "text": chunks[i]["text"],
                 "chunk_id": chunks[i]["id"],
-                "source": "ndmo_framework.pdf",
+                "source": SOURCE_DOC,
                 "start_char": chunks[i]["start_char"],
             }
         )

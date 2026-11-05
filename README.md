@@ -8,8 +8,11 @@ Built end to end from raw PDF to HTTP API: extraction → chunking → embedding
 search → grounded generation. No hosted APIs, no API keys. Qdrant runs in Docker and the
 LLM runs through Ollama, so the whole thing works offline.
 
-The reference corpus is the Saudi **NDMO Data Management and Personal Data Protection
-Standards** (v1.5, 173 pages) — but the pipeline is document-agnostic; point it at any PDF.
+A reference corpus ships with the repo — the Saudi **NDMO Data Management and Personal
+Data Protection Standards** (v1.5, 173 pages) — so `git clone` and run works with no
+setup. **It is a convenient default, not a dependency.** The pipeline is document-agnostic:
+swap in any PDF by editing one line of `config.py`. Nothing about the retrieval or
+generation logic is specific to this document, or to governance text at all.
 
 ---
 
@@ -101,8 +104,8 @@ docker run -p 6333:6333 -p 6334:6334 \
 # 3. Local LLM
 ollama pull tinyllama      # or: ollama pull mistral (better answers, slower)
 
-# 4. Corpus — drop any PDF into data/ as ndmo_framework.pdf
-#    The NDMO standards are published at https://sdaia.gov.sa
+# 4. Corpus — already present at data/ndmo_framework.pdf. To use your own,
+#    see "Swapping the corpus" below.
 
 # 5. Ingest
 python 01_extract.py       # PDF  → data/extracted.txt
@@ -146,18 +149,48 @@ post-ingestion sanity checks and container readiness probes.
 
 ---
 
+## Swapping the corpus
+
+The bundled PDF is there so the project is runnable on clone, not because the pipeline
+depends on it. To point it at a different document, edit `config.py`:
+
+```python
+SOURCE_DOC = "my_document.pdf"   # any PDF placed in data/
+COLLECTION = "my_chunks"         # its own Qdrant collection
+```
+
+Then drop the PDF in `data/` and re-run stages `01` → `03`. That's the whole change — the
+filename and collection name are referenced nowhere else. `SOURCE_DOC` is also written to
+every vector's `source` payload field, which is what lets query-time filtering keep one
+document's clauses out of another's answers, so distinct corpora can coexist in one Qdrant
+instance without bleeding into each other.
+
+Caveats when swapping: the chunk size of 512/50 was tuned against clause-structured
+regulatory prose and may not suit very different text; and `all-MiniLM-L6-v2` is an
+English model, so other languages need a multilingual embedding model.
+
+**On the bundled document:** the NDMO standards are a public regulatory framework published
+by Saudi Arabia's National Data Management Office (now under SDAIA, <https://sdaia.gov.sa>).
+It is included here purely as sample input and is redistributed unmodified; all rights
+remain with the publisher. Delete `data/ndmo_framework.pdf` and the pipeline still works
+with any replacement.
+
+---
+
 ## Repository layout
 
 | File | Role |
 |---|---|
+| `config.py` | Corpus settings — the single file to edit when swapping documents |
 | `01_extract.py` | PDF → text via pdfplumber, page markers retained |
 | `02_chunk.py` | Sliding-window chunker + the size/overlap comparison used to pick 512/50 |
 | `03_embed_store.py` | Embeds chunks, (re)creates the Qdrant collection, upserts with payload |
 | `04_query.py` | CLI retrieve-and-generate loop; prints scores alongside answers |
 | `server.py` | FastAPI service — `/assess`, `/health`, `/collection/info` |
 
-Generated artifacts (`data/extracted.txt`, `data/chunks.json`), the source PDF, and
-`qdrant_storage/` are gitignored; steps 4–5 recreate them.
+The reference PDF is tracked so the pipeline runs on clone. Generated artifacts
+(`data/extracted.txt`, `data/chunks.json`) and `qdrant_storage/` are gitignored — step 5
+recreates them in about a minute.
 
 ---
 

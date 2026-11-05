@@ -14,8 +14,11 @@ qdrant_storage/
 data/extracted.txt
 data/chunks.json
 
-# Source corpus — see README for how to supply your own PDF
+# The bundled reference corpus (data/ndmo_framework.pdf) IS tracked, so the
+# pipeline runs on clone. Ignore any other PDFs you drop in while swapping
+# corpora — see config.py.
 data/*.pdf
+!data/ndmo_framework.pdf
 
 # OS noise
 .DS_Store
