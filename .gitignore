@@ -1,0 +1,21 @@
+# Virtualenvs
+embed_env/
+.venv/
+venv/
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Qdrant's on-disk state (recreated by docker run)
+qdrant_storage/
+
+# Pipeline artifacts — regenerate with 01_extract.py / 02_chunk.py
+data/extracted.txt
+data/chunks.json
+
+# Source corpus — see README for how to supply your own PDF
+data/*.pdf
+
+# OS noise
+.DS_Store
