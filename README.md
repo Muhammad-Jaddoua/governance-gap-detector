@@ -1,5 +1,12 @@
 # Governance Gap Detector
 
+![Python](https://img.shields.io/badge/Python-3.13-3776AB?logo=python&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![Qdrant](https://img.shields.io/badge/Qdrant-vector_search-DC244C)
+![Ollama](https://img.shields.io/badge/Ollama-local_LLM-000000)
+![Docker](https://img.shields.io/badge/Docker-Qdrant-2496ED?logo=docker&logoColor=white)
+![Offline](https://img.shields.io/badge/runs-fully_offline-success)
+
 A local-first **RAG (Retrieval-Augmented Generation)** pipeline that answers compliance
 questions against a data-governance framework — and, crucially, tells you when the
 framework *doesn't* answer them.
